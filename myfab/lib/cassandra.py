@@ -1,23 +1,15 @@
-from jinja2 import Environment, FileSystemLoader
 import os
 import json
+from myfab.lib.file_handle import template_dir
 
 CONF_DIR = '{}/../conf/'.format(os.path.dirname(__file__))
 def get_cluster_json(name):
     with open('{}/{}'.format(CONF_DIR, name), 'r') as f:
         cluster = json.load(f)
     return cluster
-
-def _template_dir():
-    return Environment(
-        loader=FileSystemLoader(
-            ('{}/../template/'.format(os.path.dirname(__file__))),
-            encoding="utf-8"
-        )
-    )
     
 def generate_yaml_from_template(**kwargs):
-    env = _template_dir()
+    env = template_dir()
     template = env.get_template("cassandra.yaml")
 
     out = template.render({
@@ -31,7 +23,7 @@ def generate_yaml_from_template(**kwargs):
     return out
 
 def generate_rackdc_properties_from_template(**kwargs):
-    env = _template_dir()
+    env = template_dir()
     template = env.get_template("cassandra-rackdc.properties")
 
     out = template.render({
