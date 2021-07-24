@@ -3,8 +3,8 @@ from fabric import task, Connection
 import time
 import os
 from myfab.lib.cassandra import generate_yaml_from_template, \
-                                generate_rackdc_properties_from_template, \
-                                get_cluster_json
+                                generate_rackdc_properties_from_template
+from myfab.lib.file_handle import get_json
 
 def get_c_containerid(c):
     return c.run('docker ps -a | grep cassandra | tail -n 1 | cut -d " " -f 1', hide=True).stdout.strip()
@@ -49,9 +49,9 @@ def exec(c, cmd='uname'):
     c.run('docker exec -i {} {}'.format(container_id, cmd))
 
 @task
-def cluster(c, name='cluster1', start='0'):
+def cluster(c, conf, start='0'):
     """create cluster"""
-    cluster = get_cluster_json('{}.json'.format(name))
+    cluster = get_json(conf)
     seeds = cluster['seeds']
     cluster_name = cluster['cluster_name']
     nodes = cluster['nodes']

@@ -2,12 +2,7 @@ import os
 import json
 from myfab.lib.file_handle import template_dir
 
-CONF_DIR = '{}/../conf/'.format(os.path.dirname(__file__))
-def get_cluster_json(name):
-    with open('{}/{}'.format(CONF_DIR, name), 'r') as f:
-        cluster = json.load(f)
-    return cluster
-    
+
 def generate_yaml_from_template(**kwargs):
     env = template_dir()
     template = env.get_template("cassandra.yaml")
