@@ -13,6 +13,8 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="",
+    zip_safe=False,
+    include_package_data=True,
     packages=find_packages(),
     python_requires='>=3.6',
     install_requires=[

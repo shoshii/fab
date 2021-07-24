@@ -1,5 +1,10 @@
 .idea
 .docker
-conf/cassandra.yaml
-conf/cassandra-rackdc.properties
-conf/*.json
+.myfab
+dist
+build
+*/**/__pycache__
+*.egg-info
+myfab/conf/cassandra.yaml
+myfab/conf/cassandra-rackdc.properties
+myfab/conf/*.json

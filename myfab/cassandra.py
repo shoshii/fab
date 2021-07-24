@@ -1,7 +1,10 @@
 from invoke import Collection
 from fabric import task, Connection
-import time, json
-from myfab.lib.generate_cassandra_conf import generate_node_image
+import time
+import os
+from myfab.lib.cassandra import generate_yaml_from_template, \
+                                generate_rackdc_properties_from_template, \
+                                get_cluster_json
 
 def get_c_containerid(c):
     return c.run('docker ps -a | grep cassandra | tail -n 1 | cut -d " " -f 1', hide=True).stdout.strip()
@@ -48,12 +51,14 @@ def exec(c, cmd='uname'):
 @task
 def cluster(c, name='cluster1', start='0'):
     """create cluster"""
-    cluster = None
-    with open('./conf/{}.json'.format(name), 'r') as f:
-        cluster = json.load(f)
+    cluster = get_cluster_json('{}.json'.format(name))
     seeds = cluster['seeds']
     cluster_name = cluster['cluster_name']
     nodes = cluster['nodes']
+
+    tmp_dir = '.myfab'
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
     for key, value in nodes.items():
         print('key:{}, value:{}, cluster_name:{}, seeds:{}'.format(key, value, cluster_name, seeds))
         c = Connection(key)
@@ -63,16 +68,25 @@ def cluster(c, name='cluster1', start='0'):
             pass
         create(c)
         container_id = get_c_containerid(c)
-        generate_node_image(
+        yaml_out = generate_yaml_from_template(
             nodeip=key,
             cluster_name=cluster_name,
-            seeds=seeds,
+            seeds=seeds
+        )
+        _path = "{}/cassandra.yaml".format(tmp_dir)
+        with open(_path, "w", encoding="utf-8") as fw:
+            fw.write(yaml_out)
+            c.put(_path)
+        c.run('docker cp cassandra.yaml {}:/etc/cassandra/conf/'.format(container_id))
+
+        rackdc_out = generate_rackdc_properties_from_template(
             dc=value['dc'],
             rack=value['rack']
         )
-        c.put('conf/cassandra.yaml')
-        c.put('conf/cassandra-rackdc.properties')
-        c.run('docker cp cassandra.yaml {}:/etc/cassandra/conf/'.format(container_id))
+        _path = "{}/cassandra-rackdc.properties".format(tmp_dir)
+        with open(_path, "w", encoding="utf-8") as fw:
+            fw.write(rackdc_out)
+            c.put(_path)
         c.run('docker cp cassandra-rackdc.properties {}:/etc/cassandra/conf/'.format(container_id))
 
         if int(start) == 1:

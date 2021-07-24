@@ -1,0 +1,2 @@
+recursive-include myfab/conf *
+recursive-include myfab/template *
