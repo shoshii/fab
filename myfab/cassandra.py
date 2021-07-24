@@ -1,7 +1,7 @@
 from invoke import Collection
 from fabric import task, Connection
 import time, json
-from lib.generate_cassandra_conf import generate_node_image
+from myfab.lib.generate_cassandra_conf import generate_node_image
 
 def get_c_containerid(c):
     return c.run('docker ps -a | grep cassandra | tail -n 1 | cut -d " " -f 1', hide=True).stdout.strip()

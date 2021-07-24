@@ -1,11 +1,11 @@
 from setuptools import setup, find_packages
-from myapp.app import __VERSION__
+from myfab.app import __VERSION__
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="myapp",
+    name="myfab",
     version=__VERSION__,
     author="Shogo Hoshii",
     author_email="treasurehunt0102@gmail.com",
@@ -21,7 +21,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "myapp=myapp.app:app.run",
+            "myfab=myfab.app:app.run",
         ]
     },
 )
