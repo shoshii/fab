@@ -1,0 +1,5 @@
+.idea
+.docker
+conf/cassandra.yaml
+conf/cassandra-rackdc.properties
+conf/*.json
