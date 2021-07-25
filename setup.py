@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from myfab.app import __VERSION__
+from myfab.version import __VERSION__
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
