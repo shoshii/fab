@@ -5,9 +5,11 @@ import os
 from myfab.lib.cassandra import generate_yaml_from_template, \
                                 generate_rackdc_properties_from_template
 from myfab.lib.file_handle import get_json
+from myfab import docker
 
-def get_c_containerid(c):
-    return c.run('docker ps -a | grep cassandra | tail -n 1 | cut -d " " -f 1', hide=True).stdout.strip()
+def get_cid(c):
+    return docker.get_containerid(c, 'cassandra')
+
 
 @task
 def create(c, version='4.0.1'):
@@ -17,21 +19,22 @@ def create(c, version='4.0.1'):
     
     c.run('docker create --net=host -v cassandra-data:/var/lib/cassandra -v cassandra-log:/var/log/cassandra --name=cassandra shoshii/cassandra-centos:{}'.format(version))
 
+
 @task
 def start(c):
     """start cassandra container"""
-    container_id = get_c_containerid(c)
-    c.run('docker start {}'.format(container_id))
+    docker.start(c, 'cassandra')
+
 
 @task
 def stop(c):
     """stop cassandra container"""
-    container_id = get_c_containerid(c)
-    c.run('docker stop {}'.format(container_id))
+    docker.stop(c, 'cassandra')
+
 
 @task
 def rm(c):
-    container_id = get_c_containerid(c)
+    container_id = get_cid(c)
     try:
         stop(c)
     except:
@@ -44,8 +47,8 @@ def rm(c):
 @task
 def exec(c, cmd='uname'):
     """execute command"""
-    container_id = get_c_containerid(c)
-    c.run('docker exec -i {} {}'.format(container_id, cmd))
+    docker.exec(c, 'cassandra')
+
 
 @task
 def cluster(c, conf, start='0'):
@@ -66,7 +69,7 @@ def cluster(c, conf, start='0'):
         except:
             pass
         create(c)
-        container_id = get_c_containerid(c)
+        container_id = get_cid(c)
         yaml_out = generate_yaml_from_template(
             nodeip=key,
             cluster_name=cluster_name,
