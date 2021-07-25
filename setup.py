@@ -1,7 +1,8 @@
 from setuptools import setup, find_packages
 from myfab.version import __VERSION__
+import os
 
-with open("README.md", "r", encoding="utf-8") as fh:
+with open("{}/README.md".format(os.path.dirname(__file__)), "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
