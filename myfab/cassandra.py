@@ -17,7 +17,6 @@ def create(c, version='4.0.1'):
     
     c.run('docker create --net=host -v cassandra-data:/var/lib/cassandra -v cassandra-log:/var/log/cassandra --name=cassandra shoshii/cassandra-centos:{}'.format(version))
 
-
 @task
 def start(c):
     """start cassandra container"""
@@ -76,7 +75,7 @@ def cluster(c, conf, start='0'):
         _path = "{}/cassandra.yaml".format(tmp_dir)
         with open(_path, "w", encoding="utf-8") as fw:
             fw.write(yaml_out)
-            c.put(_path)
+        c.put(_path)
         c.run('docker cp cassandra.yaml {}:/etc/cassandra/conf/'.format(container_id))
 
         rackdc_out = generate_rackdc_properties_from_template(
@@ -86,7 +85,7 @@ def cluster(c, conf, start='0'):
         _path = "{}/cassandra-rackdc.properties".format(tmp_dir)
         with open(_path, "w", encoding="utf-8") as fw:
             fw.write(rackdc_out)
-            c.put(_path)
+        c.put(_path)
         c.run('docker cp cassandra-rackdc.properties {}:/etc/cassandra/conf/'.format(container_id))
 
         if int(start) == 1:
