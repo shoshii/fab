@@ -26,3 +26,12 @@ def generate_rackdc_properties_from_template(**kwargs):
         'rack': kwargs['rack']
     })
     return out
+
+def generate_cassandra_envsh_from_template(**kwargs):
+    env = template_dir()
+    template = env.get_template("cassandra-env.sh")
+
+    out = template.render({
+        'rmi_server_hostname': kwargs['rmi_server_hostname']
+    })
+    return out
