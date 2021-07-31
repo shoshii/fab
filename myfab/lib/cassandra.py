@@ -4,7 +4,7 @@ from myfab.lib.file_handle import template_dir
 
 
 def generate_yaml_from_template(**kwargs):
-    env = template_dir()
+    env = template_dir('cassandra')
     template = env.get_template("cassandra.yaml")
 
     out = template.render({
@@ -18,7 +18,7 @@ def generate_yaml_from_template(**kwargs):
     return out
 
 def generate_rackdc_properties_from_template(**kwargs):
-    env = template_dir()
+    env = template_dir('cassandra')
     template = env.get_template("cassandra-rackdc.properties")
 
     out = template.render({
@@ -28,7 +28,7 @@ def generate_rackdc_properties_from_template(**kwargs):
     return out
 
 def generate_cassandra_envsh_from_template(**kwargs):
-    env = template_dir()
+    env = template_dir('cassandra')
     template = env.get_template("cassandra-env.sh")
 
     out = template.render({

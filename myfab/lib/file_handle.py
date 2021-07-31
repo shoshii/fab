@@ -7,10 +7,10 @@ def get_json(path):
         _json = json.load(f)
     return _json
 
-def template_dir():
+def template_dir(name):
     return Environment(
         loader=FileSystemLoader(
-            ('{}/../template/'.format(os.path.dirname(__file__))),
+            ('{}/../template/{}/'.format(os.path.dirname(__file__), name)),
             encoding="utf-8"
         )
     )
