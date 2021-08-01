@@ -1,6 +1,7 @@
 from jinja2 import Environment, FileSystemLoader
 import os
 import json
+import shutil
 
 def get_json(path):
     with open(path, 'r') as f:
@@ -13,4 +14,10 @@ def template_dir(name):
             ('{}/../template/{}/'.format(os.path.dirname(__file__), name)),
             encoding="utf-8"
         )
+    )
+
+def upload_file(src_file_name, dest_path):
+    shutil.copy2(
+        '{}/../file/{}'.format(os.path.dirname(__file__), src_file_name),
+        dest_path
     )

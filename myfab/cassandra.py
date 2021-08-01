@@ -7,7 +7,7 @@ import subprocess
 from myfab.lib.cassandra import generate_yaml_from_template, \
                                 generate_rackdc_properties_from_template, \
                                 generate_cassandra_envsh_from_template
-from myfab.lib.file_handle import get_json
+from myfab.lib.file_handle import get_json, upload_file
 from myfab import docker
 
 from logging import getLogger, StreamHandler, DEBUG
@@ -182,9 +182,11 @@ def config(c, conf):
 
     # cassandra-env.sh
     fname = 'cassandra-env.sh'
+    exporter_name = 'cassandra-exporter-agent-0.9.10.jar'
     _path = "{}/{}".format(tmp_dir, fname)
     env_out = generate_cassandra_envsh_from_template(
-        rmi_server_hostname= c.host
+        rmi_server_hostname= c.host,
+        cassandra_exporter_agent_filename = exporter_name
     )
     with open(_path, "w", encoding="utf-8") as fw:
         fw.write(env_out)
@@ -193,6 +195,14 @@ def config(c, conf):
     c.put(_path)
     c.run('docker cp {} {}:/etc/cassandra/conf/'.format(fname, container_id))
     logger.info('uploaded {} to container:{}'.format(fname, container_id))
+
+    # cassandra-exporter-agent-0.9.10.jar
+    _path = "{}/{}".format(tmp_dir, exporter_name)
+    upload_file(src_file_name='cassandra/{}'.format(exporter_name), dest_path=_path)
+    c.put(_path)
+    c.run('docker cp {} {}:/usr/share/cassandra/lib/'.format(exporter_name, container_id))
+    logger.info('uploaded {} to container:{}'.format(exporter_name, container_id))
+
     logger.info('config ok to container:{}'.format(container_id))
 
 
