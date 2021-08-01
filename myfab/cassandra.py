@@ -76,7 +76,7 @@ def start(c):
     """start cassandra container args:"""
     logger.info('start cassandra on {}'.format(c.host))
     docker.start(c, 'cassandra')
-    max_retry = 10
+    max_retry = 20
     while True:
         time.sleep(10)
         p1 = subprocess.Popen([
