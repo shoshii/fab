@@ -14,6 +14,9 @@ def docker(c):
         pass
     c.run('newgrp docker &')
 
+    c.sudo('systemctl start docker')
+    c.sudo('systemctl enable docker')
+
 
 centos_ns = Collection('centos')
 centos_ns.add_task(docker, 'docker')
