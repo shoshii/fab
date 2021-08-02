@@ -1,0 +1,36 @@
+# my global config
+global:
+  scrape_interval:     15s
+  evaluation_interval: 30s
+  # scrape_timeout is set to the global default (10s).
+
+
+rule_files:
+#- "first.rules"
+#- "my/*.rules"
+
+scrape_configs:
+- job_name: prometheus
+
+  honor_labels: true
+  # scrape_interval is defined by the configured global (15s).
+  # scrape_timeout is defined by the global default (10s).
+
+  # metrics_path defaults to '/metrics'
+  # scheme defaults to 'http'.
+
+  static_configs:
+  - targets: ['192.168.100.220:9500', '192.168.100.221:9500']
+#    labels:
+#      my:   label
+#      your: label
+
+
+#alerting:
+#  alertmanagers:
+#  - scheme: https
+#    static_configs:
+#    - targets:
+#      - "1.2.3.4:9093"
+#      - "1.2.3.5:9093"
+#      - "1.2.3.6:9093"

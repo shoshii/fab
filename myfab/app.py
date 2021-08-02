@@ -2,12 +2,14 @@ from invoke import Collection
 from fabric.main import Fab
 from fabric import Config, Executor
 from .cassandra import cassandra_ns
+from .prometheus import prometheus_ns
 from .docker import docker_ns
 from .centos import centos_ns
 from .version import __VERSION__
 
 ns = Collection()
 ns.add_collection(cassandra_ns)
+ns.add_collection(prometheus_ns)
 ns.add_collection(docker_ns)
 ns.add_collection(centos_ns)
 
