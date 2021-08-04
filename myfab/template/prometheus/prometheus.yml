@@ -20,10 +20,14 @@ scrape_configs:
   # scheme defaults to 'http'.
 
   static_configs:
-  - targets: ['192.168.100.220:9500', '192.168.100.221:9500']
+  - targets: ['localhost:9090', 'localhost:9191']
 #    labels:
 #      my:   label
 #      your: label
+
+- job_name: 'cassandra'
+  static_configs:
+  - targets: ['192.168.100.220:9500', '192.168.100.221:9500', '192.168.100.222:9500']
 
 
 #alerting:

@@ -51,7 +51,7 @@ def rm(c):
 
 
 @task
-def start(c):
+def start(c, version='2.28.1'):
     """start prometheus container args:"""
     logger.info('start prometheus on {}'.format(c.host))
     tmp_dir = '.myfab'
@@ -62,7 +62,7 @@ def start(c):
         fw.write(yaml_out)
     c.put(_path)
     c.run('docker volume create prometheus-data')
-    c.run('docker run --name prometheus --rm -d --net=host -v prometheus-data:/prometheus -v {}:/etc/prometheus/{} prom/prometheus'.format(fname, fname))
+    c.run('docker run --name prometheus --rm -d --net=host -v prometheus-data:/var/lib/prometheus -v {}:/etc/prometheus/{} shoshii/prometheus-docker:{}'.format(fname, fname, version))
 
 
 @task
