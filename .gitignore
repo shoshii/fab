@@ -3,6 +3,7 @@
 .myfab
 dist
 build
+*/**/*.pyc
 */**/__pycache__
 *.egg-info
 myfab/conf/cassandra.yaml
