@@ -106,7 +106,7 @@ def stop(c):
 
 
 @task
-def rm(c):
+def rm(c, rm_volume=False):
     """remove cassandra container and volumes args:"""
     try:
         stop(c)
@@ -118,11 +118,12 @@ def rm(c):
     logger.debug('remove cassandra container id:{} on {}'.format(container_id, c.host))
     c.run('docker rm {}'.format(container_id))
 
-    logger.debug('remove cassandra-data volume on {}'.format(c.host))
-    c.run('docker volume remove cassandra-data')
+    if rm_volume:
+        logger.debug('remove cassandra-data volume on {}'.format(c.host))
+        c.run('docker volume remove cassandra-data')
 
-    logger.debug('create cassandra-log volume on {}'.format(c.host))
-    c.run('docker volume remove cassandra-log')
+        logger.debug('create cassandra-log volume on {}'.format(c.host))
+        c.run('docker volume remove cassandra-log')
 
 
 @task
@@ -208,7 +209,7 @@ def config(c, conf):
 
 
 @task
-def cluster(c, conf, with_start='0'):
+def cluster(c, conf, with_replace='0'):
     """create cluster args:conf, start='0'"""
     cluster = get_json(conf)
     nodes = cluster['nodes']
@@ -216,15 +217,14 @@ def cluster(c, conf, with_start='0'):
     for key, value in nodes.items():
         logger.debug('setting start on the node: key:{}, value:{}'.format(key, value))
         c = Connection(key)
-        try:
-            rm(c)
-        except:
-            pass
-        create(c)
+        if int(with_replace) == 1:
+            try:
+                rm(c)
+            except:
+                pass
+            create(c)
         config(c, conf)
-
-        if int(with_start) == 1:
-            start(c)
+        start(c)
 
 
 cassandra_ns = Collection('cassandra')
