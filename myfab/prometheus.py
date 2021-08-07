@@ -13,21 +13,26 @@ logger.setLevel(DEBUG)
 logger.addHandler(handler)
 
 
+def get_cid(c):
+    return docker.get_containerid(c, 'prometheus')
+
+
 @task
-def create(c, version='4.0.1'):
+def create(c, version='2.28.1'):
     """create prometheus container and volumes args:version"""
     logger.debug('pull prometheus image on {}'.format(c.host))
-    c.run('docker pull shoshii/prometheus-centos:{}'.format(version))
+    c.run('docker pull shoshii/prometheus-docker:{}'.format(version))
 
-    #logger.debug('create prometheus-data volume on {}'.format(c.host))
-    #c.run('docker volume create prometheus-data')
+    logger.debug('create prometheus-data volume on {}'.format(c.host))
+    c.run('docker volume create prometheus-data')
 
     #logger.debug('create prometheus-log volume on {}'.format(c.host))
     #c.run('docker volume create prometheus-log')
     
     logger.debug('create prometheus container on {}'.format(c.host))
     c.run('docker create --net=host \
-        --name=prometheus shoshii/prometheus-centos:{}'.format(version))
+        -v prometheus-data:/var/lib/prometheus \
+        --name=prometheus shoshii/prometheus-docker:{}'.format(version))
 
 
 @task
@@ -51,18 +56,26 @@ def rm(c):
 
 
 @task
-def start(c, version='2.28.1'):
-    """start prometheus container args:"""
-    logger.info('start prometheus on {}'.format(c.host))
+def config(c):
+    container_id = get_cid(c)
+    if container_id is None:
+        raise Exception('no prometheus container on {}'.format(c.host))
     tmp_dir = '.myfab'
-    fname = 'prometheus.yaml'
+    fname = 'prometheus.yml'
     yaml_out = generate_yaml_from_template()
     _path = "{}/{}".format(tmp_dir, fname)
     with open(_path, "w", encoding="utf-8") as fw:
         fw.write(yaml_out)
     c.put(_path)
-    c.run('docker volume create prometheus-data')
-    c.run('docker run --name prometheus --rm -d --net=host -v prometheus-data:/var/lib/prometheus -v {}:/etc/prometheus/{} shoshii/prometheus-docker:{}'.format(fname, fname, version))
+    c.run('docker cp {} {}:/etc/prometheus/'.format(fname, container_id))
+    logger.info('uploaded {} to container:{}'.format(fname, container_id))
+
+
+@task
+def start(c):
+    """start prometheus container args:"""
+    logger.info('start prometheus on {}'.format(c.host))
+    docker.start(c, 'prometheus')
 
 
 @task
@@ -74,6 +87,8 @@ def stop(c):
 
 
 prometheus_ns = Collection('prometheus')
+prometheus_ns.add_task(create, 'create')
+prometheus_ns.add_task(config, 'config')
 prometheus_ns.add_task(start, 'start')
 prometheus_ns.add_task(stop, 'stop')
 prometheus_ns.add_task(rm, 'rm')

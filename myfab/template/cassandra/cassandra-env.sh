@@ -303,7 +303,8 @@ if [ "x$MX4J_PORT" != "x" ]; then
     fi
 fi
 
-JVM_OPTS="$JVM_OPTS -javaagent:$CASSANDRA_HOME/lib/{{ cassandra_exporter_agent_filename }}"
+#JVM_OPTS="$JVM_OPTS -javaagent:$CASSANDRA_HOME/lib/{{ cassandra_exporter_agent_filename }}"
+JVM_OPTS="$JVM_OPTS -javaagent:${MCAC_ROOT}/lib/datastax-mcac-agent.jar"
 
 JVM_OPTS="$JVM_OPTS $JVM_EXTRA_OPTS"
 

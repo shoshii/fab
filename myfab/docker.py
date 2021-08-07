@@ -22,10 +22,11 @@ def get_containerid(c, name):
 
 
 @task
-def start(c, name):
+def start(c, name, *args):
     """start docker container args: name"""
     container_id = get_containerid(c, name)
-    c.run('docker start {}'.format(container_id))
+    str_args = ' '.join(args)
+    c.run('docker start {} {}'.format(container_id, str_args))
 
 
 @task

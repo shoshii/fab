@@ -32,7 +32,6 @@ def generate_cassandra_envsh_from_template(**kwargs):
     template = env.get_template("cassandra-env.sh")
 
     out = template.render({
-        'rmi_server_hostname': kwargs['rmi_server_hostname'],
-        'cassandra_exporter_agent_filename': kwargs['cassandra_exporter_agent_filename']
+        'rmi_server_hostname': kwargs['rmi_server_hostname']
     })
     return out

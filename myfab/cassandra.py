@@ -67,7 +67,6 @@ def create(c, version='4.0.1'):
     
     logger.debug('create cassandra container on {}'.format(c.host))
     c.run('docker create --net=host -v cassandra-data:/var/lib/cassandra \
-        -v cassandra-log:/var/log/cassandra \
         --name=cassandra shoshii/cassandra-centos:{}'.format(version))
 
 
@@ -197,12 +196,14 @@ def config(c, conf):
     logger.info('uploaded {} to container:{}'.format(fname, container_id))
 
     # cassandra-exporter-agent-0.9.10.jar
+    """
     _path = "{}/{}".format(tmp_dir, exporter_name)
     upload_file(src_file_name='cassandra/{}'.format(exporter_name), dest_path=_path)
     c.put(_path)
     c.run('docker cp {} {}:/usr/share/cassandra/lib/'.format(exporter_name, container_id))
     logger.info('uploaded {} to container:{}'.format(exporter_name, container_id))
-
+    """
+    
     logger.info('config ok to container:{}'.format(container_id))
 
 
