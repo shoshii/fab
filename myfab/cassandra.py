@@ -67,7 +67,7 @@ def create(c, version='4.0.1'):
     
     logger.debug('create cassandra container on {}'.format(c.host))
     c.run('docker create -e TZ=Asia/Tokyo --net=host \
-        -v cassandra-log:/usr/share/cassandra/logs -v cassandra-data:/var/lib/cassandra \
+        -v cassandra-data:/var/lib/cassandra \
         --name=cassandra shoshii/cassandra-centos:{}'.format(version))
 
 
