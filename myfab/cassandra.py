@@ -210,7 +210,7 @@ def config(c, conf):
 
 
 @task
-def cluster(c, conf, with_replace='0'):
+def cluster(c, conf, with_replace=False):
     """create cluster args:conf, start='0'"""
     cluster = get_json(conf)
     nodes = cluster['nodes']
@@ -218,7 +218,7 @@ def cluster(c, conf, with_replace='0'):
     for key, value in nodes.items():
         logger.debug('setting start on the node: key:{}, value:{}'.format(key, value))
         c = Connection(key)
-        if int(with_replace) == 1:
+        if with_replace:
             try:
                 rm(c)
             except:
