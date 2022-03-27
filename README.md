@@ -6,7 +6,7 @@ Apache Cassandra や Prometheusの構築、運用タスクを実行できるfabr
 ## install
 
 ```
-$ pip install .
+$ pip3 install .
 ```
 
 ## how to use
