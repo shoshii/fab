@@ -1,6 +1,18 @@
+import os
 from invoke import Collection
 from fabric import task
 
+
+@task
+def sethosts(c):
+    """set /etc/hosts"""
+    src_dir = '{}/../myfab/file/centos/'.format(os.path.dirname(__file__))
+    _path = "{}/{}".format(src_dir, 'hosts')
+    c.put(_path)
+    #c.sudo('grep 192.168.100.101 /etc/hosts || sudo echo "192.168.100.101 master1" >> /etc/hosts')
+    c.sudo('mv /home/shoshii/hosts /etc/hosts')
+    c.sudo('chown root:root /etc/hosts')
+    #c.sudo('hostname')
 
 @task
 def docker(c):
@@ -40,7 +52,37 @@ def dlhadoop(c):
     except:
         pass
 
+ZKVERSION = '3.6.3'
+@task
+def dlzk(c):
+    """download hadoop args:"""
+    c.sudo("yum install -y wget")
+    version = 'zookeeper-%s' % ZKVERSION
+    try:
+        c.run("ls apache-%s-bin.tar.gz || wget https://dlcdn.apache.org/zookeeper/%s/apache-%s-bin.tar.gz --no-check-certificate" % (version, version, version))
+        c.run("ls apache-%s-bin.tar.gz && tar zxfv apache-%s-bin.tar.gz" % (version, version))
+        c.sudo("mv /home/shoshii/apache-%s-bin /usr/local/%s" % (version, version))
+    except:
+        pass
+    c.sudo("chown -R root:root /usr/local/%s" % version)
+
+    src_dir = '{}/../myfab/file/centos/'.format(os.path.dirname(__file__))
+    _path = "{}/{}".format(src_dir, 'zoo.cfg')
+    c.put(_path)
+    c.sudo('mv /home/shoshii/zoo.cfg /usr/local/%s/conf/' % version)
+    c.sudo('chown root:root /usr/local/%s/conf/zoo.cfg' % version)
+
+@task
+def startzk(c):
+    version = 'zookeeper-%s' % ZKVERSION
+    c.sudo('/usr/local/%s/bin/zkServer.sh start' % version)
+    c.sudo('/usr/local/%s/bin/zkCli.sh -server 127.0.0.1:2181' % version)
+
+
 centos_ns = Collection('centos')
+centos_ns.add_task(sethosts, 'sethosts')
 centos_ns.add_task(docker, 'docker')
 centos_ns.add_task(java, 'java')
 centos_ns.add_task(dlhadoop, 'dlhadoop')
+centos_ns.add_task(dlzk, 'dlzk')
+centos_ns.add_task(startzk, 'startzk')
