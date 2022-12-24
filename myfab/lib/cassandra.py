@@ -17,6 +17,17 @@ def generate_yaml_from_template(**kwargs):
     })
     return out
 
+def generate_311yaml_from_template(**kwargs):
+    env = template_dir('cassandra')
+    template = env.get_template("cassandra311.yaml")
+
+    out = template.render({
+        'listen_address': kwargs['listen_address'],
+        'rpc_address': kwargs['rpc_address'],
+        'seeds': kwargs['seeds']
+    })
+    return out
+
 def generate_rackdc_properties_from_template(**kwargs):
     env = template_dir('cassandra')
     template = env.get_template("cassandra-rackdc.properties")

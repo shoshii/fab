@@ -5,6 +5,7 @@ import os
 import stat
 import subprocess
 from myfab.lib.cassandra import generate_yaml_from_template, \
+                                generate_311yaml_from_template, \
                                 generate_rackdc_properties_from_template, \
                                 generate_cassandra_envsh_from_template
 from myfab.lib.file_handle import get_json, upload_file
@@ -228,6 +229,32 @@ def cluster(c, conf, with_replace=False):
         start(c)
 
 
+CASSANDRA3_VER = '3.11.14'
+CASSANDRA3_DIR = 'apache-cassandra-%s' % CASSANDRA3_VER
+@task
+def inst311(c):
+    pkg_name = '%s-bin.tar.gz' % CASSANDRA3_DIR
+    c.run('curl -OL https://dlcdn.apache.org/cassandra/%s/%s' % (CASSANDRA3_VER, pkg_name))
+    c.run('tar xzvf %s' % pkg_name)
+
+@task
+def conf311(c, listenaddress, rpcaddress, seeds):
+    tmp_dir = '.myfab'
+    if not os.path.exists(tmp_dir):
+        os.mkdir(tmp_dir)
+    fname = 'cassandra.yaml'
+    yaml_out = generate_311yaml_from_template(
+        listen_address=listenaddress,
+        rpc_address=rpcaddress,
+        seeds=seeds
+    )
+    _path = "{}/{}".format(tmp_dir, fname)
+    with open(_path, "w", encoding="utf-8") as fw:
+        fw.write(yaml_out)
+    
+    c.put(_path, '%s/conf/cassandra.yaml' % CASSANDRA3_DIR)
+
+
 cassandra_ns = Collection('cassandra')
 cassandra_ns.add_task(create, 'create')
 cassandra_ns.add_task(config, 'config')
@@ -236,3 +263,5 @@ cassandra_ns.add_task(stop, 'stop')
 cassandra_ns.add_task(rm, 'rm')
 cassandra_ns.add_task(exec, 'exec')
 cassandra_ns.add_task(cluster, 'cluster')
+cassandra_ns.add_task(inst311, 'inst311')
+cassandra_ns.add_task(conf311, 'conf311')
